@@ -7,7 +7,7 @@ I want to make an application to automate this process such that you can enter a
 
 # CONSTITUENTS
 - [ ] A Flask app
-  - [ ] Pulling orthologs from OrthoDB
+  - [X] Pulling orthologs from OrthoDB
   - [ ] Processing orthologs into a seq and tree file
   - [ ] running CODEML positive selection analysis on data
   - [ ] serving results
