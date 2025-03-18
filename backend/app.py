@@ -1,16 +1,10 @@
-import itertools
 import requests
 import json
-
-# gene = "WBGene00004963"
-#
-# search = f"https://data.orthodb.org/v12/search?query={gene}"
-#
-# gene_search = f"https://data.orthodb.org/v12/genesearch?query={gene}"
-#
-# response_json = requests.get(gene_search).json()
-# response_json_generic = requests.get(search).json()
-# ortholog_groups = response_json_generic["data"]
+from io import StringIO
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.Align import MultipleSeqAlignment
+# from Bio.Align.Applications import MuscleCommandline
 
 def pull_OG_fasta(ortholog_group):
     url = f"https://data.orthodb.org/v12/fasta"
@@ -18,39 +12,87 @@ def pull_OG_fasta(ortholog_group):
             'id': ortholog_group,
             'seqtype': 'cds'
             }
-    response_text = requests.get(url, params=params).text.splitlines()
-    print("data pulled...processing...")
-    print(response_text[0][0:10])
-    print(response_text[1][0:10])
-    print(response_text[2][0:10])
-    print(response_text[3][0:10])
+    response_text = requests.get(url, params=params).text
+    print("Ortholog group data pulled...")
+    return response_text
+
+
+def fasta_to_dict(response_text):
+    response_text = response_text.split_lines()
     gene_index = {response_text[index].split(' ', 1)[0]: response_text[index+1] for index in range(0, len(response_text), 3)}
     return gene_index
-    
-    
-# fasta_data = list(pull_OG_fasta(group) for group in ortholog_groups)
-
-# print(len(fasta_data[0]))
-
-test = pull_OG_fasta('430340at2759')
-
-print(len(test.keys()))
-print(list(test.items())[1])
 
 
+def pull_model_organism_orthologs(gene):
+    gene_search = f"https://data.orthodb.org/v12/genesearch?query={gene}"
+    response_json = requests.get(gene_search).json()
+    orthologs = response_json["orthologs_in_model_organisms"]
+
+    ortholog_count = sum(sum(1 for found in organism["genes"]) for organism in orthologs)
+    print(f"{ortholog_count} orthologs found in model organisms...")
+    return orthologs
+
+def fasta_to_seqrecord(response_text):
+    fasta_handle = StringIO(response_text)
+    records = {seq.id: seq for seq in SeqIO.parse(fasta_handle, "fasta")}
+
+    print(f"Fasta data converted to seqrecord dict...")
+    return records
+
+def gene_list_selection_from_seqrecord(genes, records):
+    missing = []
+    result = {}
+    print("Paring down records for seleccted genes...")
+
+    for gene in genes:
+        if records.get(gene):
+            result[gene] = records[gene]
+        else:
+            missing.append(gene)
+
+    if missing:
+        print(f"WARNING: Discrepancies found between records and selected genes...")
+        for missed in missing:
+            print(f"Gene id: {missed} not found in records...")
+
+    # result = {gene: records[gene] for gene in genes}
+
+    return result
+
+def get_model_organism_genes(orthologs):
+    return [gene_id["gene_id"]["param"] for organism in orthologs for gene_id in organism["genes"]]
+
+def format_sequence_lengths(records):
+    big = max(len(record.seq) for record in records.values())
+    print(f"Maximum sequence length is {big}...")
+
+    for record in records.keys():
+        records[record].seq = Seq(str(records[record].seq).ljust(big, '-'))
+    return records
 
 
 
+gene = "WBGene00004963"
+orthologs = pull_model_organism_orthologs(gene)
+records = fasta_to_seqrecord(pull_OG_fasta('430340at2759'))
+print(list(records.items())[0][1])
+genes = gene_list_selection_from_seqrecord((get_model_organism_genes(orthologs)), records)
 
-# orthologs = response_json["orthologs_in_model_organisms"]
-#
-# ortholog_count = sum(sum(1 for found in organism["genes"]) for organism in orthologs)
-#
-# ortholog_groups = list(set(ortholog["lca"]["lca_cluster_id"] for ortholog in orthologs))
-#
-# print(ortholog_count)
-# print(response_json["gene"].keys())
-# print(orthologs[0].keys())
-# print(orthologs[0]["lca"])
-# print(ortholog_groups)
+formatted_genes = format_sequence_lengths(genes)
+
+print(list(genes.items())[0][1])
+
+
+freq = {}
+for gene in formatted_genes.values():
+    length = len(gene.seq)
+    freq[length] = freq.get(length, 0) + 1
+
+print((sorted(freq.items(), key=lambda x: x[1])[-1]))
+
+
+align = MultipleSeqAlignment(list(formatted_genes.values())[0:4])
+print(align)
+
+# print(format(align, "phylip"))
 
