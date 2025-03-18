@@ -39,10 +39,10 @@ def fasta_to_seqrecord(response_text):
     print(f"Fasta data converted to seqrecord dict...")
     return records
 
-def gene_list_selection_from_seqrecord(genes, records):
+def select_genes_from_seqrecord(genes, records):
     missing = []
     result = {}
-    print("Paring down records for seleccted genes...")
+    print("Paring down records for selected genes...")
 
     for gene in genes:
         if records.get(gene):
@@ -70,29 +70,41 @@ def format_sequence_lengths(records):
         records[record].seq = Seq(str(records[record].seq).ljust(big, '-'))
     return records
 
+def select_biggest_taxa(records):
+    return
 
 
 gene = "WBGene00004963"
 orthologs = pull_model_organism_orthologs(gene)
 records = fasta_to_seqrecord(pull_OG_fasta('430340at2759'))
 print(list(records.items())[0][1])
-genes = gene_list_selection_from_seqrecord((get_model_organism_genes(orthologs)), records)
+model_organism_genes = get_model_organism_genes(orthologs)
+genes = select_genes_from_seqrecord(model_organism_genes, records)
 
-formatted_genes = format_sequence_lengths(genes)
+# formatted_genes = format_sequence_lengths(genes)
 
 print(list(genes.items())[0][1])
 
 
 freq = {}
-for gene in formatted_genes.values():
+for gene in genes.values():
     length = len(gene.seq)
     freq[length] = freq.get(length, 0) + 1
 
+print(len(records["6239_0:000672"].seq))
 print((sorted(freq.items(), key=lambda x: x[1])[-1]))
 
+taxa_set = set(key.split(":")[0] for key in genes.keys())
 
-align = MultipleSeqAlignment(list(formatted_genes.values())[0:4])
-print(align)
+print(taxa_set)
 
+#
+# align = MultipleSeqAlignment(list(formatted_genes.values())[0:4])
+#
+# for seqrecord in align:
+#     seqrecord.id = seqrecord.id[-10:]
+#     
+# print(align)
+#
 # print(format(align, "phylip"))
-
+#
