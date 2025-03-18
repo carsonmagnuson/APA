@@ -70,7 +70,13 @@ def format_sequence_lengths(records):
         records[record].seq = Seq(str(records[record].seq).ljust(big, '-'))
     return records
 
-def select_biggest_taxa(records):
+def select_big_taxa_seq(records):
+    result = {taxa: id for taxa, id in [key.split(":") for key in records.keys()]} ##initialize a dict to hold the biggest boyos with whatever default id
+    for taxa_key in records.keys():
+        taxa = taxa_key.split(":")[0]
+        result[taxa] = max([result[taxa], taxa_key.split(":")[1]], key=lambda x: len(records[taxa + ":" + x].seq)) ##find the bigger of the two sequences and replace with that id belonging to that sequence and taxa
+    print(result)
+    print(len(result))
     return
 
 
@@ -94,9 +100,9 @@ for gene in genes.values():
 print(len(records["6239_0:000672"].seq))
 print((sorted(freq.items(), key=lambda x: x[1])[-1]))
 
-taxa_set = set(key.split(":")[0] for key in genes.keys())
+print(select_big_taxa_seq(genes))
 
-print(taxa_set)
+
 
 #
 # align = MultipleSeqAlignment(list(formatted_genes.values())[0:4])
