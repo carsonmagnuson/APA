@@ -9,8 +9,13 @@ I want to make an application to automate this process such that you can enter a
 - [ ] A Flask app
   - [X] Pulling orthologs from OrthoDB
   - [ ] Processing orthologs into a seq and tree file
-  - [ ] running CODEML positive selection analysis on data
-  - [ ] serving results
+    - [X] Sequence selection/wrangling/aligning 
+    - [X] Sequence file export
+    - [ ] Phylogenetic tree generation
+    - [ ] Tree file export
+    - [ ] Control file export
+  - [ ] Running CODEML positive selection analysis on data
+  - [ ] Serving results
 
 - [ ] A React app 
   - [ ] Taking in a gene sequence in a specific species
