@@ -1,18 +1,38 @@
 import requests
 import json
+import os
 from io import StringIO
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Align import MultipleSeqAlignment
-# from Bio.Align.Applications import MuscleCommandline
+from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
+from Bio import Phylo
+
+
+def cache_data(data, name):
+    path = f"backend/cached/{name}"
+    if type(data) == dict:
+        print("Dumping json...")
+        with open(path, "w") as file:
+            json.dump(data, file)
+    else:
+        with open(path, 'a') as f:
+            print(data, file=f)
+    return
+
 
 def pull_OG_fasta(ortholog_group):
+    if os.path.exists(f'backend/cached/{ortholog_group}.fasta'):
+        print("Data found in cache...")
+        return open(f"backend/cached/{ortholog_group}.fasta").read()
+    print("Pulling ortholog group data...")
     url = f"https://data.orthodb.org/v12/fasta"
     params = {
             'id': ortholog_group,
             'seqtype': 'cds'
             }
     response_text = requests.get(url, params=params).text
+    cache_data(response_text,f"{ortholog_group}.fasta") #cache the response so I stop maybe accidentally crashing the db
     print("Ortholog group data pulled...")
     return response_text
 
@@ -24,10 +44,16 @@ def fasta_to_dict(response_text):
 
 
 def pull_model_organism_orthologs(gene):
-    gene_search = f"https://data.orthodb.org/v12/genesearch?query={gene}"
-    response_json = requests.get(gene_search).json()
-    orthologs = response_json["orthologs_in_model_organisms"]
+    if os.path.exists(f"backend/cached/{gene}_search.json"):
+        print("Data found in cache...")
+        with open(f'backend/cached/{gene}_search.json', 'r') as file:
+            response_json = json.load(file)
+    else:
+        gene_search = f"https://data.orthodb.org/v12/genesearch?query={gene}"
+        response_json = requests.get(gene_search).json()
+        cache_data(response_json,f"{gene}_search.json") #cache the response so I stop maybe accidentally crashing the db
 
+    orthologs = response_json["orthologs_in_model_organisms"]
     ortholog_count = sum(sum(1 for found in organism["genes"]) for organism in orthologs)
     print(f"{ortholog_count} orthologs found in model organisms...")
     return orthologs
@@ -98,7 +124,28 @@ def remove_stop_codons_in_multiple(records):
     result = {key:remove_stop_codons_in_sequence(record) for key, record in records.items()}
     return result
 
+def construct_phylo_tree(alignment, rooted=False):
+    print("Constructing phylogenetic tree...")
+    calculator = DistanceCalculator('identity')
+    distance_matrix = calculator.get_distance(alignment)
+    constructor = DistanceTreeConstructor()
+    tree = constructor.upgma(distance_matrix) if rooted else constructor.nj(distance_matrix)
+    return tree
+
+def convert_organism_id_to_names(records):
+    for gene_id in records.keys():
+        print(records[gene_id])
+        organism_desc_str = records[gene_id].description
+        organism_name = organism_desc_str[organism_desc_str.index("{"):].split(",")[4].split(":")[1][1:-1]
+        print(organism_name)
+        current_id = records[gene_id].id
+        print(current_id)
+        records[gene_id].id = organism_name
+    return records
+
+
 gene = "WBGene00004963"
+print("Starting up")
 orthologs = pull_model_organism_orthologs(gene)
 records = fasta_to_seqrecord(pull_OG_fasta('430340at2759'))
 print(list(records.items())[0][1])
@@ -108,10 +155,14 @@ taxa_sequences = select_genes_from_seqrecord(select_big_taxa_seq(model_sequences
 top_10 = select_biggest_k_seq(9, taxa_sequences)
 padded_sequences = pad_sequence_lengths(top_10)
 padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
+padded_removed_and_stripped_sequences = convert_organism_id_to_names(padded_and_removed_sequences)
 align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
 print(align)
 with open('output.txt', 'a') as f:
     print(format(align, "phylip"), file=f)
+
+tree = construct_phylo_tree(align)
+Phylo.write(tree, 'tree.newick', 'newick')
 # freq = {}
 # for gene in taxa_sequences.values():
 #     length = len(gene.seq)
@@ -119,15 +170,3 @@ with open('output.txt', 'a') as f:
 #
 # print(len(records["6239_0:000672"].seq))
 # print((sorted(freq.items(), key=lambda x: x[1])[-1]))
-
-
-
-
-#
-#
-# for seqrecord in align:
-#     seqrecord.id = seqrecord.id[-10:]
-#     
-# print(align)
-#
-#
