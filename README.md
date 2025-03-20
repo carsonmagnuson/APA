@@ -8,12 +8,12 @@ I want to make an application to automate this process such that you can enter a
 # CONSTITUENTS
 - [ ] A Flask app
   - [X] Pulling orthologs from OrthoDB
-  - [ ] Processing orthologs into a seq and tree file
+  - [X] Processing orthologs into a seq and tree file
     - [X] Sequence selection/wrangling/aligning 
     - [X] Sequence file export
-    - [ ] Phylogenetic tree generation
-    - [ ] Tree file export
-    - [ ] Control file export
+    - [X] Phylogenetic tree generation
+    - [X] Tree file export
+    - ~~[ ] Control file export~~
   - [ ] Running CODEML positive selection analysis on data
   - [ ] Serving results
 

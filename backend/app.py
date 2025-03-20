@@ -7,7 +7,7 @@ from Bio.Seq import Seq
 from Bio.Align import MultipleSeqAlignment
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio import Phylo
-
+from Bio.Phylo.PAML import codeml
 
 def cache_data(data, name):
     path = f"backend/cached/{name}"
@@ -143,6 +143,30 @@ def convert_organism_id_to_names(records):
         records[gene_id].id = organism_name
     return records
 
+def run_CODEML_analysis(tree_path, seqfile_path):
+    cml = codeml.Codeml()
+    cml.alignment = seqfile_path
+    cml.tree = tree_path
+    cml.out_file = "results.out"
+    cml.working_dir = "./scratch"
+    cml.set_options(
+        seqtype=1,
+        verbose=0,
+        noisy=0,
+        RateAncestor=0,
+        model=0,
+        NSsites=[0, 1, 2],
+        CodonFreq=2,
+        cleandata=1,
+        fix_alpha=1,
+        kappa=4.54006,
+    )
+    results = cml.run()
+    ns_sites = results.get("NSsites")
+    m0 = ns_sites.get(0)
+    m0_params = m0.get("parameters")
+    print(m0_params.get("omega"))
+
 
 gene = "WBGene00004963"
 print("Starting up")
@@ -158,11 +182,13 @@ padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
 padded_removed_and_stripped_sequences = convert_organism_id_to_names(padded_and_removed_sequences)
 align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
 print(align)
-with open('output.txt', 'a') as f:
+with open('output.phylip', 'a') as f:
     print(format(align, "phylip"), file=f)
 
 tree = construct_phylo_tree(align)
-Phylo.write(tree, 'tree.newick', 'newick')
+
+Phylo.write(tree, 'tree.nex', "nexus")
+# run_CODEML_analysis('tree.nwk', 'output.phylip')
 # freq = {}
 # for gene in taxa_sequences.values():
 #     length = len(gene.seq)
