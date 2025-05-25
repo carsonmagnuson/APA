@@ -104,11 +104,13 @@ def select_big_taxa_seq(records):
     print(f"{len(result)} unique taxa found...")
     return list(key + ":" + value for key, value in result.items())
 
-def select_biggest_k_seq(k, records, gene_id):
+def select_biggest_k_seq(k, records, gene_id, base_records):
     #todo: add error checking to make sure k is smaller than or equal to records length
     top_k = sorted(list(records.values()), key=lambda x: len(x.seq))[-(k-1):] #don't forget to append the selected gene here later
     converted_dict = {seq.id: seq for seq in top_k}
-    converted_dict[gene_id] = records[gene_id]
+    if gene_id in records.keys():
+        print("FOUND GENE IN RECORDS")
+    converted_dict[gene_id] = base_records[gene_id]
     return converted_dict
 
 def remove_stop_codons_in_sequence(record, codon_stop_array = ["TAG", "TGA", "TAA"]): ## thanks to au_ndh at https://www.biostars.org/p/296261/ for this def
@@ -145,8 +147,6 @@ def convert_organism_id_to_names(records):
     return records
 
 def run_CODEML_analysis(tree_path, seqfile_path):
-    for record in records.values():
-        if record[""]
     cml = codeml.Codeml()
     cml.alignment = seqfile_path
     cml.tree = tree_path
@@ -180,7 +180,7 @@ def main():
     model_organism_genes = get_model_organism_genes(orthologs)
     model_sequences = select_genes_from_seqrecord(model_organism_genes, records)
     taxa_sequences = select_genes_from_seqrecord(select_big_taxa_seq(model_sequences), model_sequences)
-    top_10 = select_biggest_k_seq(10, taxa_sequences, gene_id)
+    top_10 = select_biggest_k_seq(10, taxa_sequences, gene_id, records)
     padded_sequences = pad_sequence_lengths(top_10)
     padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
     padded_removed_and_stripped_sequences = convert_organism_id_to_names(padded_and_removed_sequences)
