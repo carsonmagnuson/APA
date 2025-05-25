@@ -96,7 +96,7 @@ def pad_sequence_lengths(records):
         records[record].seq = Seq(str(records[record].seq).ljust(big, '-'))
     return records
 
-def select_big_taxa_seq(records, gene_id):
+def select_big_taxa_seq(records):
     result = {taxa: gene_id for taxa, gene_id in [key.split(":") for key in records.keys()]} ##initialize a dict to hold the biggest boyos with whatever default id
     for taxa_key in records.keys():
         taxa = taxa_key.split(":")[0]
@@ -104,7 +104,7 @@ def select_big_taxa_seq(records, gene_id):
     print(f"{len(result)} unique taxa found...")
     return list(key + ":" + value for key, value in result.items())
 
-def select_biggest_k_seq(k, records):
+def select_biggest_k_seq(k, records, gene_id):
     #todo: add error checking to make sure k is smaller than or equal to records length
     top_k = sorted(list(records.values()), key=lambda x: len(x.seq))[-(k-1):] #don't forget to append the selected gene here later
     converted_dict = {seq.id: seq for seq in top_k}
@@ -191,7 +191,7 @@ def main():
 
     tree = construct_phylo_tree(align)
 
-    Phylo.write(tree, 'tree.nex', "nexus")
+    Phylo.write(tree, 'tree.nwk', "newick")
     # run_CODEML_analysis('tree.nwk', 'output.phylip')
     # freq = {}
     # for gene in taxa_sequences.values():
