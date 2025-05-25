@@ -96,7 +96,7 @@ def pad_sequence_lengths(records):
         records[record].seq = Seq(str(records[record].seq).ljust(big, '-'))
     return records
 
-def select_big_taxa_seq(records):
+def select_big_taxa_seq(records, gene_id):
     result = {taxa: gene_id for taxa, gene_id in [key.split(":") for key in records.keys()]} ##initialize a dict to hold the biggest boyos with whatever default id
     for taxa_key in records.keys():
         taxa = taxa_key.split(":")[0]
@@ -106,8 +106,9 @@ def select_big_taxa_seq(records):
 
 def select_biggest_k_seq(k, records):
     #todo: add error checking to make sure k is smaller than or equal to records length
-    top_k = sorted(list(records.values()), key=lambda x: len(x.seq))[-k:] #don't forget to append the selected gene here later
+    top_k = sorted(list(records.values()), key=lambda x: len(x.seq))[-(k-1):] #don't forget to append the selected gene here later
     converted_dict = {seq.id: seq for seq in top_k}
+    converted_dict[gene_id] = records[gene_id]
     return converted_dict
 
 def remove_stop_codons_in_sequence(record, codon_stop_array = ["TAG", "TGA", "TAA"]): ## thanks to au_ndh at https://www.biostars.org/p/296261/ for this def
@@ -144,6 +145,8 @@ def convert_organism_id_to_names(records):
     return records
 
 def run_CODEML_analysis(tree_path, seqfile_path):
+    for record in records.values():
+        if record[""]
     cml = codeml.Codeml()
     cml.alignment = seqfile_path
     cml.tree = tree_path
@@ -167,32 +170,33 @@ def run_CODEML_analysis(tree_path, seqfile_path):
     m0_params = m0.get("parameters")
     print(m0_params.get("omega"))
 
+def main():
+    gene = "WBGene00004963"
+    gene_id = "6239_0:000672"
+    print("Starting up")
+    orthologs = pull_model_organism_orthologs(gene)
+    records = fasta_to_seqrecord(pull_OG_fasta('430340at2759'))
+    print(list(records.items())[0][1])
+    model_organism_genes = get_model_organism_genes(orthologs)
+    model_sequences = select_genes_from_seqrecord(model_organism_genes, records)
+    taxa_sequences = select_genes_from_seqrecord(select_big_taxa_seq(model_sequences), model_sequences)
+    top_10 = select_biggest_k_seq(10, taxa_sequences, gene_id)
+    padded_sequences = pad_sequence_lengths(top_10)
+    padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
+    padded_removed_and_stripped_sequences = convert_organism_id_to_names(padded_and_removed_sequences)
+    align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
+    print(align)
+    with open('output.phylip', 'a') as f:
+        print(format(align, "phylip"), file=f)
 
-gene = "WBGene00004963"
-print("Starting up")
-orthologs = pull_model_organism_orthologs(gene)
-records = fasta_to_seqrecord(pull_OG_fasta('430340at2759'))
-print(list(records.items())[0][1])
-model_organism_genes = get_model_organism_genes(orthologs)
-model_sequences = select_genes_from_seqrecord(model_organism_genes, records)
-taxa_sequences = select_genes_from_seqrecord(select_big_taxa_seq(model_sequences), model_sequences)
-top_10 = select_biggest_k_seq(9, taxa_sequences)
-padded_sequences = pad_sequence_lengths(top_10)
-padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
-padded_removed_and_stripped_sequences = convert_organism_id_to_names(padded_and_removed_sequences)
-align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
-print(align)
-with open('output.phylip', 'a') as f:
-    print(format(align, "phylip"), file=f)
+    tree = construct_phylo_tree(align)
 
-tree = construct_phylo_tree(align)
-
-Phylo.write(tree, 'tree.nex', "nexus")
-# run_CODEML_analysis('tree.nwk', 'output.phylip')
-# freq = {}
-# for gene in taxa_sequences.values():
-#     length = len(gene.seq)
-#     freq[length] = freq.get(length, 0) + 1
-#
-# print(len(records["6239_0:000672"].seq))
-# print((sorted(freq.items(), key=lambda x: x[1])[-1]))
+    Phylo.write(tree, 'tree.nex', "nexus")
+    # run_CODEML_analysis('tree.nwk', 'output.phylip')
+    # freq = {}
+    # for gene in taxa_sequences.values():
+    #     length = len(gene.seq)
+    #     freq[length] = freq.get(length, 0) + 1
+    #
+    # print(len(records["6239_0:000672"].seq))
+    # print((sorted(freq.items(), key=lambda x: x[1])[-1]))

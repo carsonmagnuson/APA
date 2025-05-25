@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+VENV/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Output files from your script
+# (It's good practice to ignore generated data files that can be recreated by your script)
+output.phylip
+tree.nex
+results.out
+*.fasta
+*.json # If your cached JSON files are large or easily re-creatable
+
+# Cache directory from your backend script
+backend/cached/
+
+# CODEML working directory and output files
+scratch/
+# You might want to be more specific if 'scratch' could contain other things,
+# or if CODEML produces other specific output files you always want to ignore.
+# For example, if CODEML always outputs a 'rst' file or similar:
+# rst
+# 2NG.dN
+# 2NG.dS
+# 2NG.t
+# lnf
+# rub
+
+# Operating System generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.swp
+*~
