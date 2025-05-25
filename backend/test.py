@@ -1,5 +1,5 @@
 from app import *
-
+from Bio import AlignIO
 
 def get_model_orthos():
     gene = "WBGene00004963" # choose a gene
@@ -16,6 +16,9 @@ def get_model_orthos():
 def test():
     gene = "WBGene00004963" # choose a gene
     gene_id = "6239_0:000672"
+    output_phylip_file = 'output.phylip'
+    output_newick_file = 'tree.nwk'
+
     orthologs = pull_model_organism_orthologs(gene) # pulling the model organisms that have ortholog genes.
     records = fasta_to_seqrecord(pull_OG_fasta('430340at2759')) # this seems to be pulling the ortholog group organisms in general, and putting their sequences in a dict for future ref. 
     model_organism_genes = get_model_organism_genes(orthologs)
@@ -25,11 +28,22 @@ def test():
 
     padded_sequences = pad_sequence_lengths(top_10)
     padded_and_removed_sequences = remove_stop_codons_in_multiple(padded_sequences)
-    align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
+    ## align = MultipleSeqAlignment(list(padded_and_removed_sequences.values()))
 
-    with open('output.phylip', 'a') as f:
-        print(format(align, "phylip"), file=f)
+    align = format_ids_and_create_alignment(padded_and_removed_sequences)
 
+    write_phylip_manual(align, output_phylip_file)
+    
+    tree = construct_phylo_tree(align)      
+    write_newick_tree_with_header(tree, output_newick_file)
+
+    results = run_codeml_positive_selection(output_newick_file, output_phylip_file)
+
+    print(results)
+
+    # Write in strict sequential PHYLIP format
+    # with open('output.phylip', 'w') as f: # Use 'w' to overwrite during testing
+    #     AlignIO.write(align, f, "phylip-sequential")
 test()
 
 

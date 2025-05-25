@@ -21,6 +21,7 @@ tree.nex
 results.out
 *.fasta
 *.json # If your cached JSON files are large or easily re-creatable
+paml_output
 
 # Cache directory from your backend script
 backend/cached/
