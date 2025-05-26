@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import shutil
 from io import StringIO
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -9,7 +10,7 @@ from Bio.Align import MultipleSeqAlignment
 from Bio.Phylo.TreeConstruction import DistanceCalculator, DistanceTreeConstructor
 from Bio import Phylo
 from Bio.Phylo.PAML import codeml
-import re # For regular expressions
+import re
 
 def cache_data(data, name):
     path = f"backend/cached/{name}"
@@ -180,10 +181,6 @@ def convert_organism_id_to_names(records):
         records[gene_id].id = organism_name
     return records
 
-# Ensure these imports are at the top of your app.py
-import os
-import shutil
-from Bio.Phylo.PAML import codeml # Should already be there
 
 def run_codeml_positive_selection(tree_path, seqfile_path, 
                                   output_dir="paml_output", 

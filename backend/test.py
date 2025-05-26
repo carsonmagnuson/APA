@@ -44,6 +44,8 @@ def test():
     # Write in strict sequential PHYLIP format
     # with open('output.phylip', 'w') as f: # Use 'w' to overwrite during testing
     #     AlignIO.write(align, f, "phylip-sequential")
+
+    if 
 test()
 
 
