@@ -14,7 +14,7 @@ I want to make an application to automate this process such that you can enter a
     - [X] Phylogenetic tree generation
     - [X] Tree file export
     - ~~[ ] Control file export~~
-  - [ ] Running CODEML positive selection analysis on data
+  - [X] Running CODEML positive selection analysis on data
   - [ ] Serving results
 
 - [ ] A React app 
