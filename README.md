@@ -18,7 +18,8 @@ I want to make an application to automate this process such that you can enter a
   - [X] Serving results
 
 - [ ] A React app 
-  - [ ] Taking in a gene sequence in a specific species
-  - [ ] Calling Flask API with gene sequence
-  - [ ] Displaying omega value
+  - [X] Taking in a gene ID in a specific species
+  - [X] Calling backend API with gene sequence
+  - [X] Allowing downloadable phylip, tree and results files
+  - [ ] Presenting relevant data from analysis results
 
