@@ -1,0 +1,397 @@
+/* src/App.css */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f6;
+  color: #333;
+}
+
+.App {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.App-header {
+  background-color: #4A90E2; /* A more vibrant blue */
+  padding: 20px;
+  color: white;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+  margin: -20px -20px 20px -20px; /* Extend to edges of App container */
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+main > div { /* For input sections */
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #fdfdfd;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+input[type="text"] {
+  width: calc(100% - 22px); /* Full width minus padding and border */
+  padding: 10px;
+  margin-bottom: 10px; /* Add space if button is on next line */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+button {
+  padding: 10px 18px;
+  background-color: #5cb85c; /* A friendly green */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s ease-in-out;
+  margin-right: 10px; /* Space between buttons */
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #4cae4c; /* Darker green on hover */
+}
+
+/* Specific style for download buttons if needed */
+.results button {
+    background-color: #4A90E2; /* Blue for download buttons */
+}
+.results button:hover:not(:disabled) {
+    background-color: #357ABD; /* Darker blue on hover */
+}
+
+
+.error-message {
+  color: #d9534f; /* Red for errors */
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.results {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #d1e7dd; /* Light green border */
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  text-align: left;
+}
+
+.results h2, .results h3, .results h4 {
+  color: #333;
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.results p {
+  line-height: 1.6;
+  color: #555;
+}
+
+.results pre {
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  padding: 15px;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-size: 0.9em;
+  max-height: 300px; /* Scroll for very long JSON */
+  white-space: pre-wrap;   
+  word-wrap: break-word; 
+}
+```
+* **To use this:** Replace the content of your `src/App.css` with the code above.
+* **Further improvements:** Consider using a grid or flexbox for better layout of input fields and buttons side-by-side if desired.
+
+**2. Fixing Non-Functional Download Buttons**
+
+When you say "clicking the buttons doesn't do anything," it typically means one of these:
+* A JavaScript error is occurring in the `handleDownloadFile` function, preventing `window.open` from being called.
+* The conditions within `handleDownloadFile` (like `results?.paml_run_identifier && filenameToDownload`) are not being met.
+* `window.open` is called, but the backend endpoint isn't responding correctly or there's a network issue.
+
+Let's add some debugging to your `App.tsx` and review the relevant parts.
+
+**Updated `src/App.tsx` with Debugging for Downloads:**
+
+```tsx
+// src/App.tsx
+import React, { useState } from 'react';
+import axios from 'axios';
+import './App.css';
+
+// It's good practice to define these constants,
+// matching what your backend's ALLOWED_FILENAMES expects for these.
+const DEFAULT_OUTPUT_PHYLIP_FILENAME_FRONTEND = 'output.phylip';
+const DEFAULT_OUTPUT_NEWICK_FILENAME_FRONTEND = 'tree.nwk';
+
+interface CodemlAnalysisSummary {
+  status?: string;
+  message?: string;
+  results_file_path_on_server?: string;
+  results_filename?: string; // e.g., "results.out"
+  error_details?: string;
+  M0?: { lnL?: number; parameters?: any };
+  M1a?: { lnL?: number; parameters?: any };
+  M2a?: { lnL?: number; parameters?: any };
+}
+
+interface AnalysisResult {
+  input_ncbi_id?: string;
+  target_gene_orthodb_id?: string;
+  ortholog_group_id_used?: string;
+  ortho_level_tax_id_used?: string;
+  k_sequences_requested?: number;
+  sequences_in_alignment?: number;
+  paml_run_identifier?: string;
+  paml_results_filename?: string; // This was from main_pipeline for results.out
+  codeml_analysis_summary?: CodemlAnalysisSummary;
+}
+
+function App() {
+  const [ncbiId, setNcbiId] = useState<string>('');
+  const [orthoLevel, setOrthoLevel] = useState<string>('2759');
+  const [results, setResults] = useState<AnalysisResult | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const BACKEND_URL = 'http://localhost:8000';
+
+  const handleAnalyze = async () => {
+    if (!ncbiId.trim()) {
+      setError('Please enter an NCBI Gene ID.');
+      return;
+    }
+    if (!orthoLevel.trim()) {
+        setError('Please enter an Orthology Level Tax ID.');
+        return;
+    }
+    setIsLoading(true);
+    setError(null);
+    setResults(null);
+    console.log(`Sending analysis request for NCBI ID: ${ncbiId}, Level: ${orthoLevel}`);
+
+    try {
+      const response = await axios.post(`${BACKEND_URL}/analyze/`, {
+        ncbi_id: ncbiId,
+        ortho_level_tax_id: orthoLevel,
+      });
+      console.log("Backend response received:", response.data);
+      setResults(response.data);
+    } catch (err: any) {
+      let errorMsg = 'An unexpected error occurred.';
+      if (axios.isAxiosError(err) && err.response) {
+        errorMsg = err.response.data.detail || 'An error occurred during analysis.';
+        console.error('Analysis error response:', err.response.data);
+      } else {
+        console.error('Unexpected error during analysis:', err);
+      }
+      setError(errorMsg);
+      setResults(null); // Clear any partial results
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDownloadFile = (filenameToDownload: string | undefined) => {
+    console.log("handleDownloadFile called with:", filenameToDownload);
+    console.log("Current results state:", results);
+
+    const runIdentifier = results?.paml_run_identifier;
+    
+    if (runIdentifier && filenameToDownload) {
+      const downloadUrl = `${BACKEND_URL}/download_paml_output/${runIdentifier}/${filenameToDownload}`;
+      console.log("Attempting to download from URL:", downloadUrl);
+      try {
+        // Try to open the URL
+        const newWindow = window.open(downloadUrl, '_blank');
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            // This might happen if a pop-up blocker is very aggressive
+            // or if the URL is malformed in a way that window.open fails silently.
+            console.error('window.open failed. Pop-up blocker? Malformed URL?');
+            setError(`Failed to initiate download for ${filenameToDownload}. Check browser pop-up blocker or console for errors.`);
+        }
+      } catch (e) {
+        console.error("Error during window.open for download:", e);
+        setError(`Error trying to open download link for ${filenameToDownload}.`);
+      }
+    } else {
+      console.error('Download conditions not met:', {
+        hasResults: !!results,
+        runIdentifier: runIdentifier,
+        filename: filenameToDownload,
+      });
+      setError(`Cannot download ${filenameToDownload || 'file'}: missing run identifier or filename in results.`);
+    }
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Phylogenetic Analysis</h1>
+      </header>
+      <main>
+        <div>
+          <label htmlFor="ncbiId">NCBI Gene ID:</label>
+          <input
+            type="text"
+            id="ncbiId"
+            value={ncbiId}
+            onChange={(e) => setNcbiId(e.target.value)}
+            placeholder="e.g., 173042"
+          />
+        </div>
+        <div>
+          <label htmlFor="orthoLevel">Orthology Level (NCBI TaxID):</label>
+          <input
+            type="text"
+            id="orthoLevel"
+            value={orthoLevel}
+            onChange={(e) => setOrthoLevel(e.target.value)}
+            placeholder="e.g., 2759 (Eukaryota)"
+          />
+        </div>
+        <button onClick={handleAnalyze} disabled={isLoading}>
+          {isLoading ? 'Analyzing...' : 'Run Analysis'}
+        </button>
+
+        {error && <p className="error-message">Error: {error}</p>}
+
+        {isLoading && <p>Loading analysis results...</p>}
+
+        {results && !isLoading && (
+          <div className="results">
+            <h2>Analysis Results for NCBI ID: {results.input_ncbi_id}</h2>
+            <p>Target OrthoDB ID: {results.target_gene_orthodb_id || 'N/A'}</p>
+            <p>Ortholog Group Used: {results.ortholog_group_id_used || 'N/A'} (Level: {results.ortho_level_tax_id_used || 'N/A'})</p>
+            <p>Sequences Requested: {results.k_sequences_requested !== undefined ? results.k_sequences_requested : 'N/A'}</p>
+            <p>Sequences in Final Alignment: {results.sequences_in_alignment !== undefined ? results.sequences_in_alignment : 'N/A'}</p>
+            <p>PAML Run Identifier: {results.paml_run_identifier || 'N/A'}</p>
+            
+            {results.codeml_analysis_summary && (
+              <div>
+                <h3>CODEML Analysis Status:</h3>
+                <p>Status: {results.codeml_analysis_summary.status || 'N/A'}</p>
+                <p>Message: {results.codeml_analysis_summary.message || 'N/A'}</p>
+                {results.codeml_analysis_summary.error_details && (
+                  <p>Error Details: {results.codeml_analysis_summary.error_details}</p>
+                )}
+
+                {/* Display parsed CODEML results if available */}
+                {results.codeml_analysis_summary.M0?.lnL !== undefined && (
+                    <p>M0 lnL: {results.codeml_analysis_summary.M0.lnL}</p>
+                )}
+                {results.codeml_analysis_summary.M1a?.lnL !== undefined && (
+                    <p>M1a lnL: {results.codeml_analysis_summary.M1a.lnL}</p>
+                )}
+                 {results.codeml_analysis_summary.M2a?.lnL !== undefined && (
+                    <p>M2a lnL: {results.codeml_analysis_summary.M2a.lnL}</p>
+                )}
+
+                {/* Download button for results.out */}
+                {results.paml_run_identifier && results.codeml_analysis_summary.results_filename && (
+                  <button onClick={() => handleDownloadFile(results.codeml_analysis_summary?.results_filename)}>
+                    Download {results.codeml_analysis_summary.results_filename}
+                  </button>
+                )}
+                {/* Download buttons for phylip and newick files */}
+                {results.paml_run_identifier && (
+                    <>
+                        <button onClick={() => handleDownloadFile(DEFAULT_OUTPUT_PHYLIP_FILENAME_FRONTEND)}>Download PHYLIP</button>
+                        <button onClick={() => handleDownloadFile(DEFAULT_OUTPUT_NEWICK_FILENAME_FRONTEND)}>Download Newick Tree</button>
+                    </>
+                )}
+              </div>
+            )}
+            <hr />
+            <h4>Raw JSON Response from Backend:</h4>
+            <pre>
+              {JSON.stringify(results, null, 2)}
+            </pre>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
+```
+
+**Debugging Steps for Download Buttons:**
+
+1.  **Check Frontend `console.log` Output:**
+    * Open your browser's Developer Tools (usually by pressing F12) and go to the "Console" tab.
+    * Click one of the download buttons.
+    * You should see logs from `handleDownloadFile`:
+        * `"handleDownloadFile called with: results.out"` (or `output.phylip`, `tree.nwk`)
+        * `"Current results state: { ... }"` (this will show the whole `results` object)
+        * `"Attempting to download from URL: http://localhost:8000/download_paml_output/your_run_identifier/your_filename"`
+    * If the `console.error('Download conditions not met: ...')` message appears, it means `results.paml_run_identifier` or the `filenameToDownload` was missing/undefined when the button was clicked. Examine the logged state to see why. The screenshot (`image_fe2bcd.png`) shows `paml_run_identifier` is present in the JSON, so this is less likely unless there's a timing issue with rendering.
+
+2.  **Check Browser Network Tab:**
+    * In the Developer Tools, switch to the "Network" tab.
+    * Click a download button.
+    * You should see a new request appear for the download URL (e.g., `/download_paml_output/...`).
+    * **Inspect this request:**
+        * **Status Code:** Is it 200 (OK)? Or is it 404 (Not Found), 403 (Forbidden), 500 (Internal Server Error), etc.?
+        * **Headers:** Check the response headers. For a successful download, you should see `Content-Disposition: attachment; filename="..."`.
+        * **Response Body/Preview:** If it's an error (4xx or 5xx), the preview or response tab might show an error message from your FastAPI backend.
+
+3.  **Check FastAPI Backend Logs:**
+    * When you click a download button, your FastAPI server should log the incoming request to the `/download_paml_output/...` endpoint.
+    * Look for any errors logged by `api_server.py` related to file access, path validation, or `FileResponse`. For example, it logs if the file is not found or if a path traversal attempt is detected.
+
+**Common reasons for `window.open` "not doing anything" visibly:**
+
+* **Pop-up Blocker:** While usually permissive for direct user clicks, aggressive pop-up blockers *could* interfere. Unlikely to be silent, though.
+* **Backend Error:** If the backend returns an error (e.g., 404 File Not Found, 500 Internal Server Error), the new tab opened by `window.open` might show the error page or close very quickly. The Network tab is key here.
+* **Incorrect Filename Constants:** Ensure `DEFAULT_OUTPUT_PHYLIP_FILENAME_FRONTEND` and `DEFAULT_OUTPUT_NEWICK_FILENAME_FRONTEND` in `App.tsx` exactly match the `DEFAULT_OUTPUT_PHYLIP_FILENAME` and `DEFAULT_OUTPUT_NEWICK_FILENAME` keys used in your backend's `ALLOWED_FILENAMES` dictionary (which are imported from `main_pipeline.py`). This seems okay based on my last check, but worth verifying.
+* **Missing `results.codeml_analysis_summary.results_filename`:** If the backend response doesn't include this specific field under `codeml_analysis_summary`, the button for `results.out` won't pass a filename. The screenshot shows `paml_results_filename` at the top level of `results`, but also `codeml_analysis_summary` has its own details. My updated `main_pipeline.py` puts `results_filename` inside `codeml_analysis_summary` where it's returned by `run_codeml_positive_selection`. Ensure your `AnalysisResult` and `CodemlAnalysisSummary` interfaces in `App.tsx` match the structure your backend is actually sending.
+
+    Looking at your screenshot (`image_fe2bcd.png`), the JSON response includes:
+    ```json
+    "paml_run_identifier": "run_173042_lvl2759",
+    "paml_results_filename": "results.out", // This is at the top level of results
+    "codeml_analysis_summary": {
+      "status": "CODEML_RAN_PARSING_FAILED",
+      // ...
+      // results_filename might ALSO be here if run_codeml_positive_selection adds it
+    }
+    ```
+    My `App.tsx` snippet (id: `app_tsx_alt2` and `app_tsx_download_debug`) for the `results.out` download button uses `results.codeml_analysis_summary?.results_filename`. If the backend sends the main results filename as `results.paml_results_filename`, you'll need to adjust the frontend:
+    ```tsx
+    // In App.tsx, for the results.out download button
+    {results.paml_run_identifier && results.paml_results_filename && ( // Use the top-level filename
+      <button onClick={() => handleDownloadFile(results.paml_results_filename)}>
+        Download {results.paml_results_filename}
+      </button>
+    )}
