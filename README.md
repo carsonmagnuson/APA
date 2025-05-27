@@ -15,7 +15,7 @@ I want to make an application to automate this process such that you can enter a
     - [X] Tree file export
     - ~~[ ] Control file export~~
   - [X] Running CODEML positive selection analysis on data
-  - [ ] Serving results
+  - [X] Serving results
 
 - [ ] A React app 
   - [ ] Taking in a gene sequence in a specific species
