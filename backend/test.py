@@ -1,5 +1,6 @@
 from app import *
 from Bio import AlignIO
+from data_fetching import *
 
 def get_model_orthos():
     gene = "WBGene00004963" # choose a gene
@@ -13,7 +14,7 @@ def get_model_orthos():
     top_10 = select_biggest_k_seq(9, taxa_sequences) # Great now we take the 9 biggest to combine with our original
 
 
-def test():
+def test_1():
     gene = "WBGene00004963" # choose a gene
     gene_id = "6239_0:000672"
     output_phylip_file = 'output.phylip'
@@ -45,7 +46,12 @@ def test():
     # with open('output.phylip', 'w') as f: # Use 'w' to overwrite during testing
     #     AlignIO.write(align, f, "phylip-sequential")
 
-    if 
+
+def test():
+    ncbi_id = "173042"
+    initial_gene_data = pull_model_organism_orthologs(gene_query=ncbi_id)
+    print(initial_gene_data)
+
 test()
 
 
