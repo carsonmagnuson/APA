@@ -1,10 +1,10 @@
 // src/App.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
 // Define constants for filenames that match your backend's ALLOWED_FILENAMES
-const FILENAME_RESULTS_OUT = 'results.out';
+//const FILENAME_RESULTS_OUT = 'results.out';
 const FILENAME_PHYLIP = 'output.phylip'; // From DEFAULT_OUTPUT_PHYLIP_FILENAME in backend
 const FILENAME_NEWICK = 'tree.nwk';     // From DEFAULT_OUTPUT_NEWICK_FILENAME in backend
 
