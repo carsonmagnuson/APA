@@ -18,7 +18,7 @@ def run_pipeline(
 
     """
 
-    ortholog_compilation = compile_orthologs(ncbi_gene_id, taxanomic_level_id) # This returns a seqRecord object
+    ortholog_compilation = compile_orthologs(ncbi_gene_id, taxanomic_level_id) # This returns a seqRecord list
     selection_path = select_orthologs(ortholog_compilation, k_sequences) # This generates a fasta file, returns path to file
     phylip_path = run_muscle(selection_path) # This generates a phylip file, returns path to file
     results_path = run_codeml(phylip_path) # This generates a codeml results file, returns path to file
