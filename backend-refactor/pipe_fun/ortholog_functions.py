@@ -110,7 +110,7 @@ if __name__ == '__main__':
     
     ortholog_group_id = select_ortholog_group(test_ncbi_ids[0], test_levels[0])
     ortholog_compilation = compile_orthologs(ortholog_group_id)
-    selected_orthologs = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
+    selection_path = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
 
 
 
