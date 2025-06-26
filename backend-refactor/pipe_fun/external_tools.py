@@ -1,5 +1,47 @@
 import subprocess, os, shutil
 
+def run_mega(selection_path: str) -> str:
+    """
+    Runs MEGA tool on a fasta file of orthologs.
+
+    Args:
+        selection_path: What is the path of the fasta file with the selected orthologs?
+
+    Returns:
+        A path to a phylip file.
+
+    """
+    # STEP 1: Create a mao file. 
+
+    run_name = selection_path.split('.')[0]
+    mao_path = f"{run_name}.mao"
+    mao_content = f"""
+    [MEGA]
+    Title = Codon-Align-to-Phylip
+    Analysis = Codon-align
+    Alignment Algorithm = MUSCLE
+    Genetic Code = Universal
+    Format = Phylip_Interleaved
+
+    [Data]
+    """
+
+    with open(mao_path, "w") as mao_file:
+        mao_file.write(mao_content)
+
+    # STEP 2: Determine output path and design a MEGA command to execute.
+    output_path = f"{run_name}.phylip"
+    mega_command = [
+        "megacc",
+        "-a", mao_path,
+        "-d", selection_path,
+        "-o", output_path
+    ]
+
+    # STEP 3: Execute MEGA command and return path to phylip file.
+    result = subprocess.run(mega_command, check=True, capture_output=True, text=True)
+    print(result)
+    return output_path
 
 def run_muscle(selection_path: str) -> str:
     """
@@ -27,9 +69,10 @@ def run_muscle(selection_path: str) -> str:
     print(result)
     return output_path
 
+
 def run_iqtree(phylip_path: str) -> str:
     """
-    Runs IQTREE analysis on a phylip file of selected, aligned orthologs.
+    Runs IQTREE analysis on a phylip file of selected, aligned, cleaned orthologs.
 
     Args:
         phylip_path: What is the path of the phylip file to be analyzed?
@@ -70,8 +113,8 @@ def run_codeml(
     """
 
     # STEP 1: Check for/create a work directory for CODEML, copy phylip and tree files inside.
-    run_path_name = phylip_path.split('.')[0] 
-    output_directory = f"{run_path_name}"
+    run_name = phylip_path.split('.')[0] 
+    output_directory = f"{run_name}"
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     shutil.copy(phylip_path, f"{output_directory}/in.phylip")
@@ -108,6 +151,9 @@ def run_codeml(
 
 if __name__ == "__main__":
     # print(run_muscle("29865at6231_run/8_selected_orthologs.fasta"))
-    # print(run_iqtree("29865at6231_run/8_selected_orthologs.phylip"))
-    print(run_codeml("29865at6231_run/8_selected_orthologs.phylip", "29865at6231_run/8_selected_orthologs.treefile"))
+    print(run_gblocks("29865at6231_run/8_selected_orthologs.phylip"))
+    # print(run_iqtree("29865at6231_run/8_selected_orthologs_cleaned.phy-gb"))
+
+
+    # print(run_codeml("29865at6231_run/8_selected_orthologs.phylip", "29865at6231_run/8_selected_orthologs.treefile")) remember this needs to be changed
 
