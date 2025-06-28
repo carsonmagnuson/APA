@@ -1,68 +1,29 @@
 import subprocess, os, shutil
 
-def run_mega(selection_path: str) -> str:
-    """
-    Runs MEGA tool on a fasta file of orthologs.
-
-    Args:
-        selection_path: What is the path of the fasta file with the selected orthologs?
-
-    Returns:
-        A path to a phylip file.
-
-    """
-    # STEP 1: Create a mao file. 
-
-    run_name = selection_path.split('.')[0]
-    mao_path = f"{run_name}.mao"
-    mao_content = f"""
-    [MEGA]
-    Title = Codon-Align-to-Phylip
-    Analysis = Codon-align
-    Alignment Algorithm = MUSCLE
-    Genetic Code = Universal
-    Format = Phylip_Interleaved
-
-    [Data]
-    """
-
-    with open(mao_path, "w") as mao_file:
-        mao_file.write(mao_content)
-
-    # STEP 2: Determine output path and design a MEGA command to execute.
-    output_path = f"{run_name}.phylip"
-    mega_command = [
-        "megacc",
-        "-a", mao_path,
-        "-d", selection_path,
-        "-o", output_path
-    ]
-
-    # STEP 3: Execute MEGA command and return path to phylip file.
-    result = subprocess.run(mega_command, check=True, capture_output=True, text=True)
-    print(result)
-    return output_path
 
 def run_muscle(selection_path: str) -> str:
     """
-    Runs MUSCLE tool on a fasta file of orthologs.
+    Runs MUSCLE protein sequence alignment tool on a fasta file of ortholog CDS
 
     Args:
-        selection_path: What is the path of the fasta file with the selected orthologs?
+        selection_path: What is the path of the fasta file with the selected orthologs? (needs to have run folder first in path, k identifier first in name)
 
     Returns:
-        A path to a phylip file.
+        A path to a fasta file
 
     """
 
     # STEP 1: Determine output path and design a MUSCLE command to execute.
-    output_path = f"{selection_path.split('.')[0]}.phylip"
+    run_folder = f"{selection_path.split('/')[0]}"
+    k_identifier = f"{selection_path.split('/')[1][0]}"
+    output_path = f"{run_folder}/{k_identifier}_aligned_orthologs_p.fasta"
     muscle_command = [
         "muscle",
         "-in", selection_path,
         "-out", output_path,
-        "-phyi" # Output in PHYLIP format (phyi for interleaved, phys for sequential)
+        "-fasta" # Output in fasta format
     ]
+
 
     # STEP 2: Execute MUSCLE command and return path to phylip file.
     result = subprocess.run(muscle_command, check=True, capture_output=True, text=True)
@@ -151,7 +112,7 @@ def run_codeml(
 
 if __name__ == "__main__":
     # print(run_muscle("29865at6231_run/8_selected_orthologs.fasta"))
-    print(run_gblocks("29865at6231_run/8_selected_orthologs.phylip"))
+    print(run_mega("29865at6231_run/8_selected_orthologs.fasta"))
     # print(run_iqtree("29865at6231_run/8_selected_orthologs_cleaned.phy-gb"))
 
 

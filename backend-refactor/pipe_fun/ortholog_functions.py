@@ -98,7 +98,7 @@ def select_orthologs(
         os.makedirs(output_directory)
 
     # STEP 5: Write selected list to a fasta file and return the path. Using length of the selected list in the name.
-    output_filepath = f"{output_directory}/{len(selected_orthologs)}_selected_orthologs.fasta"
+    output_filepath = f"{output_directory}/{len(selected_orthologs)}_selected_orthologs_CDS.fasta"
     SeqIO.write(selected_orthologs, output_filepath, "fasta")
     return output_filepath
  
@@ -111,6 +111,4 @@ if __name__ == '__main__':
     ortholog_group_id = select_ortholog_group(test_ncbi_ids[0], test_levels[0])
     ortholog_compilation = compile_orthologs(ortholog_group_id)
     selection_path = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
-
-
 
