@@ -1,8 +1,8 @@
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
-from external_tools import run_muscle, run_pal2nal
-from conversion_functions import convert_to_proteins
+from external_tools import run_codeml, run_iqtree, run_muscle, run_pal2nal
+from conversion_functions import convert_to_proteins, convert_colon2dash
 
 import requests, io, os
 
@@ -120,8 +120,14 @@ if __name__ == '__main__':
     print(proteins_path)
     aligned_proteins_path = run_muscle(proteins_path)
     print(aligned_proteins_path)
-    phylip_path = run_pal2nal(aligned_proteins_path, selection_path)
-    print(phylip_path)
+    paml_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path))
+    print(paml_path)
+    fasta_aligned_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path, "fasta"))
+    print(fasta_aligned_path)
+    treefile = run_iqtree(fasta_aligned_path)
+    print(treefile)
+    results = run_codeml(paml_path, treefile)
+    print(results)
 
 
     

@@ -26,3 +26,31 @@ def convert_to_proteins(fasta_filepath: str) -> str:
     output_filepath = f"{fasta_filepath.split('.')[0]}_coverted2prot.fasta"
     SeqIO.write(records, output_filepath, "fasta")
     return output_filepath
+
+
+
+def convert_colon2dash(filepath: str) -> str:
+    """
+    Converts colons in the name to dashes. Primarily for iqtree, because iqtree uses colons for other stuff.
+
+    Args:
+        filepath: What is the name of the file you're converting names in?
+
+    Returns:
+        Converted filepath.
+
+    """
+
+    # STEP 1: Read in the file while replacing colons
+    # lines = list(list(char if char != ":" else '-' for char in l) for l in open(filepath, "r").splitlines())
+    lines = [l.replace(':', '-') for l in open(filepath, "r").read().splitlines()]
+
+    # STEP 2: Write out to a fasta file and return the filepath
+    output_filepath = f"{filepath.split('.')[0]}_colon2dash.{filepath.split('.')[1]}"
+    
+    with open(output_filepath, "w", encoding="utf-8") as f:
+        for line in lines:
+            f.write(line)
+            f.write("\n")
+
+    return output_filepath

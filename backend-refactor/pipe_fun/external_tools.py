@@ -2,13 +2,14 @@ import subprocess, os, shutil
 
 import subprocess
 
-def run_pal2nal(proteins_path: str, CDS_path: str) -> str:
+def run_pal2nal(proteins_path: str, CDS_path: str, output_type: str = 'paml') -> str:
     """
     Runs PAL2NAL to convert nucleotide sequences onto a protein MSA.
 
     Args:
         proteins_path: Path to the aligned protein .fasta/.aln file (from MUSCLE).
         CDS_path: Path to the unaligned nucleotide .fasta file.
+        output_type: file type of FASTA, PAML, CODON
 
     Returns:
         A path to the resulting .phylip codon alignment file.
@@ -19,13 +20,14 @@ def run_pal2nal(proteins_path: str, CDS_path: str) -> str:
         "pal2nal.pl",          # Assumes pal2nal.pl is in your PATH
         proteins_path,      # The aligned protein file
         CDS_path, # The unaligned DNA file
-        "-output", "paml",     # Essential: Formats output for PAML/CODEML/IQTREE
+        "-output", output_type,     # Essential: Formats output for PAML/CODEML/IQTREE
         "-nogap"               # Recommended: Removes columns with gaps/stop codons
     ]
 
     # STEP 2: Execute command, capture stdout, and write to file.
-    output_path = f"{proteins_path.split('.')[0]}.phylip"
+    output_path = f"{proteins_path.split('.')[0]}.{'phylip' if output_type == 'paml' else 'fasta'}"
     result = subprocess.run(pal2nal_command, check=True, capture_output=True, text=True)
+    print(result)
     
     with open(output_path, "w") as f:
         f.write(result.stdout)
@@ -137,7 +139,7 @@ def run_codeml(
         ctl_file.write(control_content)
 
     # STEP 3: Run CODEML analysis and return analysis file path.
-    # result = subprocess.run("codeml", check=True, capture_output=True, text=True, cwd=output_directory)
+    result = subprocess.run("codeml", check=True, capture_output=True, text=True, cwd=output_directory)
     return f"{output_directory}/{results_name}"
 
 
