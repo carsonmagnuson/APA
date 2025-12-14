@@ -1,6 +1,7 @@
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
+from external_tools import run_muscle
 
 import requests, io, os
 
@@ -109,6 +110,16 @@ if __name__ == '__main__':
     test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
     
     ortholog_group_id = select_ortholog_group(test_ncbi_ids[0], test_levels[0])
+    print(ortholog_group_id)
     ortholog_compilation = compile_orthologs(ortholog_group_id)
+    print(ortholog_compilation)
     selection_path = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
+    print(selection_path)
+    proteins_path = convert_to_proteins(selection_path)
+    print(proteins_path)
+    phylip_path = run_muscle(proteins_path)
+    print(phylip_path)
+
+    
+    
 

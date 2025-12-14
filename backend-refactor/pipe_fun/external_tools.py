@@ -1,9 +1,41 @@
 import subprocess, os, shutil
 
+import subprocess
+
+def run_pal2nal(protein_msa_path: str, nucleotide_fasta_path: str) -> str:
+    """
+    Runs PAL2NAL to convert nucleotide sequences onto a protein MSA.
+
+    Args:
+        protein_msa_path: Path to the aligned protein .fasta/.aln file (from MUSCLE).
+        nucleotide_fasta_path: Path to the unaligned nucleotide .fasta file.
+
+    Returns:
+        A path to the resulting .phylip codon alignment file.
+    """
+    # STEP 1: Determine output path and design PAL2NAL command.
+    # We use the protein filename as the base, replacing extension with .phylip
+    output_path = f"{protein_msa_path.split('.')[0]}.phylip"
+    
+    pal2nal_command = [
+        "pal2nal.pl",          # Assumes pal2nal.pl is in your PATH
+        protein_msa_path,      # The aligned protein file
+        nucleotide_fasta_path, # The unaligned DNA file
+        "-output", "paml",     # Essential: Formats output for PAML/CODEML/IQTREE
+        "-nogap"               # Recommended: Removes columns with gaps/stop codons
+    ]
+
+    # STEP 2: Execute command, capture stdout, and write to file.
+    result = subprocess.run(pal2nal_command, check=True, capture_output=True, text=True)
+    
+    with open(output_path, "w") as f:
+        f.write(result.stdout)
+
+    return output_path
 
 def run_muscle(selection_path: str) -> str:
     """
-    Runs MUSCLE protein sequence alignment tool on a fasta file of ortholog CDS
+    Runs MUSCLE protein sequence alignment tool on a fasta file of ortholog protein sequences
 
     Args:
         selection_path: What is the path of the fasta file with the selected orthologs? (needs to have run folder first in path, k identifier first in name)
@@ -108,6 +140,7 @@ def run_codeml(
     # STEP 3: Run CODEML analysis and return analysis file path.
     # result = subprocess.run("codeml", check=True, capture_output=True, text=True, cwd=output_directory)
     return f"{output_directory}/{results_name}"
+
 
 
 if __name__ == "__main__":
