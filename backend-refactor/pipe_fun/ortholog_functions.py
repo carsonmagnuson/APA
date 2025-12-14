@@ -2,6 +2,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
 from external_tools import run_muscle
+from conversion_functions import convert_to_proteins
 
 import requests, io, os
 
@@ -117,8 +118,8 @@ if __name__ == '__main__':
     print(selection_path)
     proteins_path = convert_to_proteins(selection_path)
     print(proteins_path)
-    phylip_path = run_muscle(proteins_path)
-    print(phylip_path)
+    # phylip_path = run_muscle(proteins_path)
+    # print(phylip_path)
 
     
     
