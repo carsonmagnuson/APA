@@ -29,7 +29,23 @@ Yeah this doesn't exist yet.
 
 # Installation:
 
+All you need out of all these files are the python scripts in the backend-refactor folder. You can just grab those scripts and figure it out, hopefully.
+
 Good luck.
+
+# Next Steps
+
+Make these scripts user friendly?
+- I would like to turn this into an opensource browser application that you can just plug and play, but I'll settle for a command line tool, if I'm being honest.
+
+Add logic to the ortholog selection to automate *good* selections?
+- At the moment, it just takes a bunch of random orthologs. 
+- Ostensibly, you could make an algorithm to assess for suitability.
+
+Add containerization?
+- It was a pain to install everything, I won't lie. Would not want to have to go through all of that more than once.
+- Would probably allow the creation of a web app, too.
+
 
 
 
