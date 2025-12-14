@@ -1,7 +1,7 @@
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
-from external_tools import run_muscle
+from external_tools import run_muscle, run_pal2nal
 from conversion_functions import convert_to_proteins
 
 import requests, io, os
@@ -88,7 +88,7 @@ def select_orthologs(
         ortholog_compilation.remove(record)
 
     # STEP 2: Place ortholog compilation in order of most suitable to least suitable.
-
+    # ortholog_compilation.sort(key = lambda x: -len(x.seq))
 
     # STEP 3: Extend preselected list with most suitable sequence candidates
     remaining_k = k_sequences - len(preselected_sequences)
@@ -118,8 +118,11 @@ if __name__ == '__main__':
     print(selection_path)
     proteins_path = convert_to_proteins(selection_path)
     print(proteins_path)
-    # phylip_path = run_muscle(proteins_path)
-    # print(phylip_path)
+    aligned_proteins_path = run_muscle(proteins_path)
+    print(aligned_proteins_path)
+    phylip_path = run_pal2nal(aligned_proteins_path, selection_path)
+    print(phylip_path)
+
 
     
     

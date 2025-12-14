@@ -2,30 +2,29 @@ import subprocess, os, shutil
 
 import subprocess
 
-def run_pal2nal(protein_msa_path: str, nucleotide_fasta_path: str) -> str:
+def run_pal2nal(proteins_path: str, CDS_path: str) -> str:
     """
     Runs PAL2NAL to convert nucleotide sequences onto a protein MSA.
 
     Args:
-        protein_msa_path: Path to the aligned protein .fasta/.aln file (from MUSCLE).
-        nucleotide_fasta_path: Path to the unaligned nucleotide .fasta file.
+        proteins_path: Path to the aligned protein .fasta/.aln file (from MUSCLE).
+        CDS_path: Path to the unaligned nucleotide .fasta file.
 
     Returns:
         A path to the resulting .phylip codon alignment file.
     """
-    # STEP 1: Determine output path and design PAL2NAL command.
-    # We use the protein filename as the base, replacing extension with .phylip
-    output_path = f"{protein_msa_path.split('.')[0]}.phylip"
+    # STEP 1: design PAL2NAL command.
     
     pal2nal_command = [
         "pal2nal.pl",          # Assumes pal2nal.pl is in your PATH
-        protein_msa_path,      # The aligned protein file
-        nucleotide_fasta_path, # The unaligned DNA file
+        proteins_path,      # The aligned protein file
+        CDS_path, # The unaligned DNA file
         "-output", "paml",     # Essential: Formats output for PAML/CODEML/IQTREE
         "-nogap"               # Recommended: Removes columns with gaps/stop codons
     ]
 
     # STEP 2: Execute command, capture stdout, and write to file.
+    output_path = f"{proteins_path.split('.')[0]}.phylip"
     result = subprocess.run(pal2nal_command, check=True, capture_output=True, text=True)
     
     with open(output_path, "w") as f:
