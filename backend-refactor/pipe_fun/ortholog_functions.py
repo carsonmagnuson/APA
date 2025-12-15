@@ -2,6 +2,7 @@ from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
 from copy import deepcopy
+from collections import Counter
 # from external_tools import run_codeml, run_iqtree, run_muscle, run_pal2nal
 # from conversion_functions import convert_to_proteins, convert_colon2dash
 
@@ -91,6 +92,11 @@ def select_orthologs(
 
     # STEP 2: Place ortholog compilation in order of most suitable to least suitable.
     # ortholog_compilation.sort(key = lambda x: -len(x.seq))
+
+    # STEP 2.5: Remove paralogs.
+    # species_freq = dict(Counter(record.species for record in ortholog_compilation))
+    # Then remove all records with more than 1 as their species value...or maybe sort using this. Idk. 
+    # But you can simply reference this freq dict as you go through the list of orthologs and it's O(n).
 
     # STEP 3: Extend preselected list with most suitable sequence candidates
     remaining_k = k_sequences - len(preselected_sequences)
