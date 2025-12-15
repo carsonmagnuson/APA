@@ -37,6 +37,7 @@ Good luck.
 
 Make these scripts user friendly?
 - I would like to turn this into an opensource browser application that you can just plug and play, but I'll settle for a command line tool, if I'm being honest.
+- Would be nice to check if the necessary requirements are installed.
 
 Add logic to the ortholog selection to automate *good* selections?
 - At the moment, it just takes a bunch of random orthologs. 

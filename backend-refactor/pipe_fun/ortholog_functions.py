@@ -1,8 +1,9 @@
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
 from typing import List
-from external_tools import run_codeml, run_iqtree, run_muscle, run_pal2nal
-from conversion_functions import convert_to_proteins, convert_colon2dash
+from copy import deepcopy
+# from external_tools import run_codeml, run_iqtree, run_muscle, run_pal2nal
+# from conversion_functions import convert_to_proteins, convert_colon2dash
 
 import requests, io, os
 
@@ -84,6 +85,7 @@ def select_orthologs(
     """
 
     # STEP 1: Remove the preselected sequences from the ortholog compilation.
+    ortholog_compilation = deepcopy(ortholog_compilation)
     for record in preselected_sequences:
         ortholog_compilation.remove(record)
 
@@ -104,30 +106,30 @@ def select_orthologs(
     SeqIO.write(selected_orthologs, output_filepath, "fasta")
     return output_filepath
  
-
-if __name__ == '__main__':
-
-    test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
-    test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
-    
-    ortholog_group_id = select_ortholog_group(test_ncbi_ids[0], test_levels[0])
-    print(ortholog_group_id)
-    ortholog_compilation = compile_orthologs(ortholog_group_id)
-    print(ortholog_compilation)
-    selection_path = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
-    print(selection_path)
-    proteins_path = convert_to_proteins(selection_path)
-    print(proteins_path)
-    aligned_proteins_path = run_muscle(proteins_path)
-    print(aligned_proteins_path)
-    paml_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path))
-    print(paml_path)
-    fasta_aligned_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path, "fasta"))
-    print(fasta_aligned_path)
-    treefile = run_iqtree(fasta_aligned_path)
-    print(treefile)
-    results = run_codeml(paml_path, treefile)
-    print(results)
+#
+# if __name__ == '__main__':
+#
+#     test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
+#     test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
+#     
+#     ortholog_group_id = select_ortholog_group(test_ncbi_ids[1], test_levels[1])
+#     print(ortholog_group_id)
+#     ortholog_compilation = compile_orthologs(ortholog_group_id)
+#     print(ortholog_compilation)
+#     selection_path = select_orthologs(ortholog_compilation, 10, ortholog_group_id)
+#     print(selection_path)
+#     proteins_path = convert_to_proteins(selection_path)
+#     print(proteins_path)
+#     aligned_proteins_path = run_muscle(proteins_path)
+#     print(aligned_proteins_path)
+#     paml_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path))
+#     print(paml_path)
+#     fasta_aligned_path = convert_colon2dash(run_pal2nal(aligned_proteins_path, selection_path, "fasta"))
+#     print(fasta_aligned_path)
+#     treefile = run_iqtree(fasta_aligned_path)
+#     print(treefile)
+#     results = run_codeml(paml_path, treefile)
+#     print(results)
 
 
     
