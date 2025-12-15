@@ -49,5 +49,7 @@ Add containerization?
 
 
 
+# Workflow
 
+![image](APA-Workflow-2025-12-14.png)
 
