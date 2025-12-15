@@ -42,6 +42,7 @@ Make these scripts user friendly?
 Add logic to the ortholog selection to automate *good* selections?
 - At the moment, it just takes a bunch of random orthologs. 
 - Ostensibly, you could make an algorithm to assess for suitability.
+- Should try adding some basic paralog filtering -> if a species is included more than once in the set of orthologs, remove all associated genes.
 
 Add containerization?
 - It was a pain to install everything, I won't lie. Would not want to have to go through all of that more than once.
