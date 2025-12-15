@@ -1,4 +1,4 @@
-# AUTOMATED EVOLUTIONARY PRESSURE ANALYSIS (AutoEPA Pipeline) (Working title)
+# Phylogenetic and Evolutionary Analysis Automation Library (PEAAL) (Working Title)
 
 This is a little pipeline project with the aim of melding existing bioinformatics tools into an automatic pipeline. In particular, running CODEML positive selection analysis on a selected gene of interest.
 
