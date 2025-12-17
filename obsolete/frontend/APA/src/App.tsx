@@ -32,8 +32,8 @@ interface AnalysisResult {
 }
 
 function App() {
-  const [ncbiId, setNcbiId] = useState<string>('');
-  const [orthoLevel, setOrthoLevel] = useState<string>('2759');
+  const [ncbiId, setNcbiId] = useState<string>('173042');
+  const [orthoLevel, setOrthoLevel] = useState<string>('6231');
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

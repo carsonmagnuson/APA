@@ -1,7 +1,7 @@
 import logging
 import os
 import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 
 # Assuming these custom modules are in the same directory or PYTHONPATH
 from data_fetching import (
@@ -17,7 +17,6 @@ from sequence_processing import (
     select_biggest_k_seq,
     pad_sequence_lengths,
     remove_stop_codons_in_multiple,
-    convert_organism_id_to_names,
     format_ids_and_create_alignment
 )
 from phylogenetic_analysis import construct_phylo_tree, run_codeml_positive_selection

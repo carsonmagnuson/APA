@@ -1,0 +1,20 @@
+{
+    "data": [
+        "29865at6231"
+    ],
+    "count": "1",
+    "status": "ok",
+    "bigdata": [
+        {
+            "id": "29865at6231",
+            "d2t": 10,
+            "name": "EGF-like domain-containing protein",
+            "public_id": "29865at6231",
+            "relevance": 32752.781,
+            "gene_count": "89",
+            "level_name": "Nematoda",
+            "present_in": "62"
+        }
+    ],
+    "message": null
+}

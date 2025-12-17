@@ -1,0 +1,20 @@
+{
+    "data": [
+        "191585at40674"
+    ],
+    "count": "1",
+    "status": "ok",
+    "bigdata": [
+        {
+            "id": "191585at40674",
+            "d2t": 19,
+            "name": "Hemoglobin subunit alpha",
+            "public_id": "191585at40674",
+            "relevance": 31436.664,
+            "gene_count": "462",
+            "level_name": "Mammalia",
+            "present_in": "253"
+        }
+    ],
+    "message": null
+}
