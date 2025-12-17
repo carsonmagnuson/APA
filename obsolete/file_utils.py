@@ -18,7 +18,7 @@ if __name__ == '__main__':
 logger = logging.getLogger(__name__)
 
 # --- Constants ---
-CACHE_DIR = "backend/cached" # Default cache directory
+CACHE_DIR = "cached" # Default cache directory
 
 def cache_data(data: Any, filename: str, directory: str = CACHE_DIR) -> None:
     """

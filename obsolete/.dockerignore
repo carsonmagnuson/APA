@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git/
+.gitignore
+*.md
+cached/
+paml_output/ 

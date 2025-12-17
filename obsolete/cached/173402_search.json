@@ -1,0 +1,39 @@
+{
+    "gene": {
+        "aas": "216",
+        "exons": "6",
+        "gene_id": {
+            "id": "CELE_T01D1.3",
+            "param": "6239_0:00117c"
+        },
+        "more_info": true,
+        "description": "BPTI/Kunitz inhibitor domain-containing protein",
+        "how_much_more_info": 2,
+        "genomic_coordinates": {
+            "dna_id": "BX284602.5",
+            "position": "[174400:175642](-)",
+            "chromosome": "II",
+            "protein_id": "CCD71493.1"
+        }
+    },
+    "status": "ok",
+    "message": null,
+    "organism": {
+        "id": "6239_0",
+        "name": "Caenorhabditis elegans",
+        "type": "taxonomy",
+        "organism_id": "GCA_000002985.3",
+        "cluster_or_map": "C",
+        "tax_definition": {
+            "strain": "Bristol N2",
+            "organism": "Caenorhabditis elegans"
+        }
+    },
+    "organism_xref": "https://www.uniprot.org/taxonomy/6239",
+    "nb_genes_matched_the_query": "1",
+    "genes_and_clusters_statistics": {
+        "clusters_count": 46537,
+        "total_genes_count": 20374,
+        "clustered_genes_count": 17665
+    }
+}

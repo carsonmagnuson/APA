@@ -1,0 +1,20 @@
+{
+    "data": [
+        "75627at9443"
+    ],
+    "count": "1",
+    "status": "ok",
+    "bigdata": [
+        {
+            "id": "75627at9443",
+            "d2t": 24,
+            "name": "cellular tumor antigen p53",
+            "public_id": "75627at9443",
+            "relevance": 25654.205,
+            "gene_count": "45",
+            "level_name": "Primates",
+            "present_in": "43"
+        }
+    ],
+    "message": null
+}

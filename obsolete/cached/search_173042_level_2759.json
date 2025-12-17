@@ -1,0 +1,20 @@
+{
+    "data": [
+        "430340at2759"
+    ],
+    "count": "1",
+    "status": "ok",
+    "bigdata": [
+        {
+            "id": "430340at2759",
+            "d2t": 3,
+            "name": "notch",
+            "public_id": "430340at2759",
+            "relevance": 31939.18,
+            "gene_count": "6864",
+            "level_name": "Eukaryota",
+            "present_in": "2496"
+        }
+    ],
+    "message": null
+}
