@@ -1,7 +1,5 @@
 import subprocess, os, shutil
 
-import subprocess
-
 def run_pal2nal(proteins_path: str, CDS_path: str, output_type: str = 'paml') -> str:
     """
     Runs PAL2NAL to convert nucleotide sequences onto a protein MSA.
