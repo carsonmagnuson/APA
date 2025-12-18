@@ -15,11 +15,11 @@ def run_pal2nal(proteins_path: str, CDS_path: str, output_type: str = 'paml') ->
     # STEP 1: design PAL2NAL command.
     
     pal2nal_command = [
-        "pal2nal.pl",          # Assumes pal2nal.pl is in your PATH
-        proteins_path,      # The aligned protein file
-        CDS_path, # The unaligned DNA file
-        "-output", output_type,     # Essential: Formats output for PAML/CODEML/IQTREE
-        "-nogap"               # Recommended: Removes columns with gaps/stop codons
+        "pal2nal.pl",          # you better have pal2nal.pl in your path
+        proteins_path,         # Aligned proteins
+        CDS_path,              # Unaligned CDS
+        "-output", output_type,
+        "-nogap"               # Removes columns with gaps/stop codons
     ]
 
     # STEP 2: Execute command, capture stdout, and write to file.
@@ -52,7 +52,7 @@ def run_muscle(selection_path: str) -> str:
         "muscle",
         "-in", selection_path,
         "-out", output_path,
-        "-fasta" # Output in fasta format
+        "-fasta" # format
     ]
 
 
