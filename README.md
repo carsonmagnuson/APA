@@ -29,9 +29,11 @@ Yeah this doesn't exist yet.
 
 # Installation:
 
-All you need out of all these files are the python scripts in the backend-refactor folder. You can just grab those scripts and figure it out, hopefully.
+All you need out of all these files are the python scripts in the pipeline folder. You can just grab those scripts and figure it out, hopefully.
 
 Good luck.
+
+Okay no, actually just check out pipeline.py, if you can run that with your taxanomic level and ncbi gene id of choice, you should be good. Provided you have the requirements installed. I should probably add a check to determine you have the right stuff installed and to tell you if something goes wrong.
 
 # Next Steps
 
