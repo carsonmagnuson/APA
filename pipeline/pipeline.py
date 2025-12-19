@@ -15,7 +15,8 @@ def run_pipeline(
     ncbi_gene_id: str,
     k_sequences: int = 10,
     taxanomic_level_id: str = "2759",
-    ) -> Optional[Dict[str, Any]]:
+    ) -> str
+    # Optional[Dict[str, Any]]:
     """
     Runs the main pipeline.
 
@@ -25,7 +26,7 @@ def run_pipeline(
         taxanomic_level_id: At what taxanomic level is your analysis to occur? Defaults to NCBI taxon ID 2759 of Eukaryota.
 
     Returns:
-        Dictionary of results parsed from results.out, format tbd.
+        Should return a dictionary of results parsed from results.out, format tbd. Instead, currently returns a filepath.
 
     """
 
