@@ -11,14 +11,14 @@ from pipe_fun import (
     run_codeml
 )
 
-def run_pipeline(
+def run_single_selection_pipeline(
     ncbi_gene_id: str,
     k_sequences: int = 10,
     taxanomic_level_id: str = "2759",
     ) -> str
     # Optional[Dict[str, Any]]:
     """
-    Runs the main pipeline.
+    Runs the main pipeline that requires a single gene id
 
     Args:
         ncbi_gene_id: What is the id of the ID of the gene you want to run analysis on?
@@ -43,6 +43,19 @@ def run_pipeline(
 
     return results_path
 
+
+def run_pre_selection_pipeline()
+    """
+    Runs a pipeline for a set of pre-selected gene ids.
+
+    Args:
+        ncbi_gene_list: What are the gene ids you want to analyze, in a list?
+
+    Returns:
+        Should return a dictionary of results parsed from results.out, format tbd. Instead, currently returns a filepath.
+
+    """
+    return
 
 
 
