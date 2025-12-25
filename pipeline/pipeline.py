@@ -15,8 +15,8 @@ from pipe_fun import (
 
 def run_single_selection_pipeline(
     ncbi_gene_id: str,
-    k_sequences: int = 10,
     taxanomic_level_id: str = "2759",
+    k_sequences: int = 10,
     ) -> str:
     # Optional[Dict[str, Any]]:
     """
@@ -46,7 +46,7 @@ def run_single_selection_pipeline(
     return results_path
 
 
-def run_pre_selection_pipeline()
+def run_pre_selection_pipeline():
     """
     Runs a pipeline for a set of pre-selected gene ids.
 
@@ -63,18 +63,18 @@ def run_pre_selection_pipeline()
 
 if __name__ == '__main__':
     args = parse()
-        if args.s:
-            print(run_pre_selection_pipeline())
+    if args.specified:
+        print(run_pre_selection_pipeline())
 
-        elif args.gene_id:
-            print(run_single_selection_pipeline(args.gene_id, args.taxa_level_id))
-        else:
-            print("You have to specify a gene for automated analysis, or specify a list of genes with -s")
+    elif args.gene_id:
+        print(run_single_selection_pipeline(args.gene_id, args.taxa))
+    else:
+        print("You have to specify a gene for automated analysis, or specify a list of genes with -s")
 
-    test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
-    test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
+    # test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
+    # test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
 
-    print(run_pipeline(test_ncbi_ids[0]))
+    # print(run_pipeline(test_ncbi_ids[0]))
  
 
     
