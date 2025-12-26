@@ -1,4 +1,5 @@
 from typing import Dict, Any, Optional
+from parser import parse
 from pipe_fun import (
     select_ortholog_group,
     compile_orthologs,
@@ -11,11 +12,12 @@ from pipe_fun import (
     run_codeml
 )
 
+
 def run_single_selection_pipeline(
     ncbi_gene_id: str,
-    k_sequences: int = 10,
     taxanomic_level_id: str = "2759",
-    ) -> str
+    k_sequences: int = 10,
+    ) -> str:
     # Optional[Dict[str, Any]]:
     """
     Runs the main pipeline that requires a single gene id
@@ -44,7 +46,7 @@ def run_single_selection_pipeline(
     return results_path
 
 
-def run_pre_selection_pipeline()
+def run_pre_selection_pipeline():
     """
     Runs a pipeline for a set of pre-selected gene ids.
 
@@ -60,11 +62,19 @@ def run_pre_selection_pipeline()
 
 
 if __name__ == '__main__':
+    args = parse()
+    if args.specified:
+        print(run_pre_selection_pipeline())
 
-    test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
-    test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
+    elif args.gene_id:
+        print(run_single_selection_pipeline(args.gene_id, args.taxa))
+    else:
+        print("You have to specify a gene for automated analysis, or specify a list of genes with -s")
 
-    print(run_pipeline(test_ncbi_ids[0]))
+    # test_ncbi_ids = ["173042", "173402", "3039"] # C. elegans spe-39, C. elegans lin-39, Human HBA1
+    # test_levels = ["6231", "6231", "40674"]    # Nematoda, Nematoda, Mammalia
+
+    # print(run_pipeline(test_ncbi_ids[0]))
  
 
     

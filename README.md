@@ -33,7 +33,7 @@ All you need out of all these files are the python scripts in the pipeline folde
 
 Good luck.
 
-Okay no, actually just check out pipeline.py, if you can run that with your taxanomic level and ncbi gene id of choice, you should be good. Provided you have the requirements installed. I should probably add a check to determine you have the right stuff installed and to tell you if something goes wrong.
+Okay no, actually just check out pipeline.py, if you can run that with your taxanomic level and ncbi gene id of choice, you should be good. Provided you have the requirements installed. I should probably add a check to determine you have the right stuff installed and to tell you if something goes wrong. I've added some extremely basic CLI functionality, but at the moment you can only specify a single gene.
 
 # Next Steps
 
