@@ -50,6 +50,8 @@ Add containerization?
 - It was a pain to install everything, I won't lie. Would not want to have to go through all of that more than once.
 - Would probably allow the creation of a web app, too.
 
+# Additional Notes
+- I initally attempted to harness vibe-coding for this project, in a limited format. I tried defining tight requirements to Gemini and then working with individual snippets...but I was disppointed in the extent to which needless bloat was generated. It pervaded every snippet and the mental overhead to splice things together quickly grew obscene. You can find the remenants of that initial attempt within the obsolete folder. Regardless, it allowed me to gain a better understanding of the current limmitations of AI and how the pieces of this project should fit together.
 
 
 # Workflow
